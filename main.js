@@ -3,10 +3,11 @@
 
     var app = {
     
-        toolBtn: document.querySelector('.menu-bar'),
+        menuBtn: document.querySelector('.menu-bar'),
+        toolBtn: document.querySelector('.tool-bar'),
     }
 
-    app.tool = {
+    app.menubar = {
         openFileBtn: function(e){
             console.log(e.target.id)
             document.querySelector('#openFile').click()
@@ -16,10 +17,14 @@
         }
     }
 
+    app.toobar = {
+        
+    }
+
     //event
-    app.toolBtn.addEventListener('click', function(e){
-        if(app.tool[e.target.id]){
-            app.tool[e.target.id](e)
+    app.menuBtn.addEventListener('click', function(e){
+        if(app.menubar[e.target.id]){
+            app.menubar[e.target.id](e)
         }
     })
 
