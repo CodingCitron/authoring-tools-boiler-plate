@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
+    <link rel="stylesheet" href="googleIcons.css">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <pre id="bringData" class="hidden">
+
+    </pre>
+    <main class="workspace">
+        <div class="hidden">
+            <input type="file" id="openFile">
+        </div>
+        <nav class="menu-bar">
+            <ul>
+                <li>
+                    <button>파일</button>
+                    <ul>
+                        <li id="openFileBtn">
+                            열기
+                        </li>
+                        <li id="saveFileBtn">저장</li>
+                        <li>닫기</li>
+                    </ul>
+                </li>
+                <li>
+                    <button>편집</button>
+                    <ul>
+                        <li>실행 취소</li>
+                        <li>복사</li>
+                        <li>변형</li>
+                    </ul>
+                </li>
+                <li>
+                    <button>가이드</button>
+                    <ul>
+                        <li>실행 취소</li>
+                        <li>복사</li>
+                        <li>변형</li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="layout-divide clear">
+            <aside class="tool-bar">
+                <button>
+                    <span class="material-icons">
+                        play_arrow
+                    </span>
+                </button>
+                <button>
+                    <span class="material-icons">
+                        pause
+                    </span>
+                </button>
+                <button>
+                    <span class="material-icons">
+                        volume_up
+                    </span>
+                </button>
+                <button>
+                    <span class="material-icons">
+                        volume_off
+                    </span>
+                </button>
+            </aside>
+            <div class="work-area">
+                <canvas>
+
+                </canvas>
+            </div>
+        </div>
+    </main>
+    <script src="zip.min.js"></script>
+    <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+    <script src="main.js"></script>
+</body>
+</html>
