@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
-    <link rel="stylesheet" href="googleIcons.css">
-    <link rel="stylesheet" href="normalize.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/googleIcons.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <pre id="bringData" class="hidden">
@@ -50,36 +50,93 @@
         </nav>
         <div class="layout-divide clear">
             <aside class="tool-bar">
-                <button>
+                <button id="drawCircle">
                     <span class="material-icons">
-                        play_arrow
+                        edit
                     </span>
                 </button>
                 <button>
+                    <span class="material-icons">
+                        auto_fix_normal
+                    </span>
+                </button>
+                <button id="playPause">
+                    <span class="material-icons">
+                        play_arrow
+                    </span>
                     <span class="material-icons">
                         pause
                     </span>
                 </button>
-                <button>
+                <button id="volumeController">
+                    <div>
+                        <input type="range" min="0" max="1" step="0.01">
+                    </div>
                     <span class="material-icons">
                         volume_up
                     </span>
-                </button>
-                <button>
                     <span class="material-icons">
                         volume_off
                     </span>
                 </button>
             </aside>
             <div class="work-area">
-                <canvas>
+                <div class="work-video-area">
+                    <div>
+                        <h3 class="file-title">
+                            <span class="material-icons">
+                                task
+                            </span>
+                            <span class="file-name">
+                                file-name
+                            </span>
+                        </h3>
+                        <div class="work-range">
+                            <div id="video-wrapper">
 
-                </canvas>
+                            </div>
+                            <div id="canvas-wrapper">
+                            </div>
+                        </div>
+                        <footer class="work-footer clear">
+                            <div>
+                                <span>0:00</span>
+                                 ~
+                                <span></span>
+                            </div>
+                            <div>
+                                <span>Scale:</span>
+                                <span>1</span>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+                <div id="waveform-wrapper">
+                    <div id="waveform"></div>
+                    <div id="waveTimeline"></div>
+                </div>    
             </div>
+            <aside class="right-aside-info">
+                <section>
+                    <h4>클립 모음</h4>
+                    <div class="clip-list">
+
+                    </div>
+                </section>
+            </aside>
         </div>
     </main>
-    <script src="zip.min.js"></script>
-    <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
-    <script src="main.js"></script>
+    <script src="lib/zip.min.js"></script>
+    <script src="/lib/wavesurfer.js"></script>
+    <script src="/lib/wavesurfer.regions.min.js"></script>
+    <script src="/lib/fabric.min.js"></script>
+    <script src="/lib/tf-core.js"></script>
+    <script src="/lib/tf-converter.js"></script>
+    <script src="/lib/tf-backend-webgl.js"></script>
+    <script src="/lib/handpose.js"></script>
+    <!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
+    <script src="./js/util.js"></script>
+    <script src="./js/authoringTool.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
