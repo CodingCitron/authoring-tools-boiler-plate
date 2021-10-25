@@ -10,7 +10,8 @@
         video: {
             element: '',
             status: 'pause',
-            scale: '',
+            scaleX: '',
+            scaleY: '',
         },
 
         canvas: {
@@ -24,7 +25,17 @@
 
         workArray: [],
         activeEvent: false,
-        mode: ''
+        mode: '',
+    }
+
+    app.markScale = function(){
+        var markScale = document.querySelectorAll('.work-footer > .work-scale span')
+        var video = app.video.element
+        var scale = calcScale(video.videoWidth, video.videoHeight, video.offsetWidth, video.offsetHeight)
+        markScale[1].textContent = scale.x.toFixed(2)
+        markScale[3].textContent = scale.y.toFixed(2)
+        app.video.scaleX = scale.x
+        app.video.scaleY = scale.y
     }
 
     app.video.volumeUp = function(){
@@ -36,7 +47,6 @@
     } 
 
     app.initialize = function(){
-        console.log('initiallize')
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
         var waveform = document.getElementById('waveform')
@@ -56,9 +66,10 @@
         }
 
         app.video.status = 'pause'
+        app.observer.disconnect()
 
         workVideoArea.classList.remove('active')
-        playPause.classList.remove('active')        
+        playPause.classList.remove('active')
     }
 
     /**
@@ -72,7 +83,7 @@
         var videoWrapper = document.getElementById('video-wrapper')
         var canvasWrapper = document.getElementById('canvas-wrapper')
         var fileName = workVideoArea.querySelector('.work-video-area .file-name')
-        var markDuration = document.querySelector('.work-footer > div > span:last-child') 
+        var markDuration = document.querySelector('.work-footer > .work-timer > span:last-child')
 
         this.video.element = document.createElement('video')
         this.canvas.element = document.createElement('canvas')
@@ -93,6 +104,7 @@
         app.status = app.interface.load(video, canvas.id)
         .then(function(resolve){
             // console.log(app)
+            app.markScale()
             markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
             if(!app.activeEvent) app.loadEvent() 
         }).catch(function(error){
@@ -114,10 +126,12 @@
     app.toolbar = {
         drawCircle: function(e){
             var pointList = app.interface.hands.drawPoint()
+            var video = app.video.element
+
             if(pointList.length > 0){
 
                 for(var i = 0; i < pointList.length; i++){
-                    app.interface.canvas.draw(pointList[i][0], pointList[i][1], app.darwOption.radius, app.darwOption.color)
+                    app.interface.canvas.draw(pointList[i][0] * video.scaleX, pointList[i][1] * video.scaleY, app.darwOption.radius, app.darwOption.color)
                 }
 
             }else{
@@ -223,6 +237,4 @@
     }
     
     //keyEvent
-
-
 }())
