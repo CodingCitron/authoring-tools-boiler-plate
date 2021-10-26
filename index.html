@@ -11,9 +11,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <pre id="bringData" class="hidden">
-
-    </pre>
     <main class="workspace">
         <div class="hidden">
             <input type="file" id="openFile">
@@ -80,9 +77,9 @@
                     </span>
                 </button>
             </aside>
-            <div class="work-area">
-                <div class="work-video-area">
-                    <div>
+            <div class="middle-area">
+                <div class="work-area">
+                    <div class="work-video-area">
                         <h3 class="file-title">
                             <span class="material-icons">
                                 task
@@ -91,29 +88,33 @@
                                 file-name
                             </span>
                         </h3>
-                        <div class="work-range">
-                            <div id="video-wrapper">
+                        <div>
+                            <div class="work-range">
+                                <div id="video-wrapper">
 
-                            </div>
-                            <div id="canvas-wrapper">
+                                </div>
+                                <div id="canvas-wrapper">
+                                </div>
                             </div>
                         </div>
                         <footer class="work-footer clear">
-                            <div class="work-timer">
-                                <span>0:00</span>
-                                 ~
-                                <span></span>
-                            </div>
-                            <div class="work-scale">
-                                <span>ScaleX:</span>
-                                <span>1</span>
-                                <span>ScaleY:</span>
-                                <span>1</span>
+                            <div class="info">
+                                <div class="work-timer">
+                                    <span>0:00</span>
+                                    ~
+                                    <span></span>
+                                </div>
+                                <div class="work-scale">
+                                    <span>ScaleX:</span>
+                                    <span>1</span>
+                                    <span>ScaleY:</span>
+                                    <span>1</span>
+                                </div>
                             </div>
                         </footer>
                     </div>
                 </div>
-                <div id="waveform-wrapper">
+                <div id="waveform-wrapper" class="clear">
                     <div id="waveform"></div>
                     <div id="waveTimeline"></div>
                 </div>    
@@ -128,14 +129,14 @@
             </aside>
         </div>
     </main>
-    <script src="lib/zip.min.js"></script>
-    <script src="/lib/wavesurfer.js"></script>
-    <script src="/lib/wavesurfer.regions.min.js"></script>
-    <script src="/lib/fabric.min.js"></script>
-    <script src="/lib/tf-core.js"></script>
-    <script src="/lib/tf-converter.js"></script>
-    <script src="/lib/tf-backend-webgl.js"></script>
-    <script src="/lib/handpose.js"></script>
+    <script src="./lib/zip.min.js"></script>
+    <script src="./lib/wavesurfer.js"></script>
+    <script src="./lib/wavesurfer.regions.min.js"></script>
+    <script src="./lib/fabric.min.js"></script>
+    <script src="./lib/tf-core.js"></script>
+    <script src="./lib/tf-converter.js"></script>
+    <script src="./lib/tf-backend-webgl.js"></script>
+    <script src="./lib/handpose.js"></script>
     <!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
     <script src="./js/util.js"></script>
     <script src="./js/authoringTool.js"></script>

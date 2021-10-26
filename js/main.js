@@ -13,11 +13,15 @@
             scaleX: '',
             scaleY: '',
         },
+        copyVideo: {
 
+        },
         canvas: {
             element: '',
         },
+        copyCanvas: {
 
+        },
         darwOption: {
             radius: 3,
             color: 'red' 
@@ -29,7 +33,7 @@
     }
 
     app.markScale = function(){
-        var markScale = document.querySelectorAll('.work-footer > .work-scale span')
+        var markScale = document.querySelectorAll('.work-footer .work-scale span')
         var video = app.video.element
         var scale = calcScale(video.videoWidth, video.videoHeight, video.offsetWidth, video.offsetHeight)
         markScale[1].textContent = scale.x.toFixed(2)
@@ -46,7 +50,7 @@
 
     } 
 
-    app.initialize = function(){
+    app.initialize = async function(){
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
         var waveform = document.getElementById('waveform')
@@ -66,24 +70,20 @@
         }
 
         app.video.status = 'pause'
-        app.observer.disconnect()
-
         workVideoArea.classList.remove('active')
         playPause.classList.remove('active')
     }
 
     /**
-     * @param {readAsDataURL} url 
-     * @param {object} fileInfo other file infomation
+     * @param {object} object 
      */
-    app.load = async function({ url, fileInfo }){
-        app.initialize()
+    app.load = async function(object){
+        await app.initialize()
 
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
         var canvasWrapper = document.getElementById('canvas-wrapper')
         var fileName = workVideoArea.querySelector('.work-video-area .file-name')
-        var markDuration = document.querySelector('.work-footer > .work-timer > span:last-child')
 
         this.video.element = document.createElement('video')
         this.canvas.element = document.createElement('canvas')
@@ -92,24 +92,24 @@
         var canvas = this.canvas.element
 
         video.id = 'videoElement'
-        video.src = url
+        video.src = URL.createObjectURL(object)
 
         canvas.id = 'canvas'
-        fileName.textContent = fileInfo.name
+        fileName.textContent = object.name
 
         videoWrapper.append(video)
         canvasWrapper.append(canvas)
         workVideoArea.classList.add('active')
-
-        app.status = app.interface.load(video, canvas.id)
-        .then(function(resolve){
-            // console.log(app)
-            app.markScale()
-            markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
-            if(!app.activeEvent) app.loadEvent() 
-        }).catch(function(error){
-            throw new Error('Failed to load.')
-        })
+        
+        // app.status = app.interface.load(video, canvas.id)
+        // .then(function(resolve){
+        //     app.markScale()
+        //     markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
+        //     if(!app.activeEvent) app.loadEvent() 
+        // }).catch(function(error){
+        //     throw new Error('Failed to load.')
+        // })
+        return { video, canvas }
     }    
 
     app.menubar = {
@@ -126,14 +126,15 @@
     app.toolbar = {
         drawCircle: function(e){
             var pointList = app.interface.hands.drawPoint()
-            var video = app.video.element
+            var video = app.video
 
             if(pointList.length > 0){
 
                 for(var i = 0; i < pointList.length; i++){
                     app.interface.canvas.draw(pointList[i][0] * video.scaleX, pointList[i][1] * video.scaleY, app.darwOption.radius, app.darwOption.color)
+                    console.log(pointList[i][0], pointList[i][1])
+                    console.log(video.scaleX, video.scaleY)
                 }
-
             }else{
                 console.log('not recognized.')
                 //인식하지 못했을 때 알람
@@ -175,65 +176,87 @@
     app.fileBtn.addEventListener('change', function(e){
         if(!e.target.files || !e.target.files.length) return console.log('not Files')
         if(checkFileExtension(e.target.files[0].name)){
-            var reader = new FileReader()
-            var fileInfo = e.target.files[0]
-            reader.readAsDataURL(fileInfo)
-            reader.addEventListener('load', function(e){
-                app.load.call(app, { url: e.target.result, fileInfo: fileInfo })
-            })
+            // var reader = new FileReader()
+            // var fileInfo = e.target.files[0]
+            // reader.readAsDataURL(fileInfo)
+            // reader.addEventListener('load', function(e){
+                app.load.call(app, e.target.files[0])
+                .then(function(result){
+                    result.video.addEventListener('loadeddata', function(){
+                        app.status = app.interface.load(result.video, result.canvas.id)
+                        .then(function(resolve){
+                            var markDuration = document.querySelector('.work-footer .work-timer span:last-child')
+                            app.markScale()
+                            markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
+                            if(!app.activeEvent) app.loadEvent.maintained()
+                            app.loadEvent.needReload()
+                        }).catch(function(error){
+                            throw new Error(error)
+                        })  
+                    }, { once: true })
+                })
+            // })
         }else{
             return console.log('mp4 확장자가 아닙니다.')
         }
     })
 
-    app.loadEvent = function(){
-        app.activeEvent = true
-        var volumeController = document.getElementById('volumeController')
-        var volumeInput = document.querySelector('#volumeController input')
-        var timer = document.querySelector('.work-footer > div > span:first-child') 
+    app.loadEvent = {
+        maintained: function(){
+            app.activeEvent = true
+            var volumeController = document.getElementById('volumeController')
+            var volumeInput = document.querySelector('#volumeController input')
 
-        console.log('Event Activation!')
+            console.log('Event Activation!')
 
-        app.toolBtn.addEventListener('click', function(e){
-            var button = e.target.closest('button')
-            if(!button) return
-            if(app.toolbar[button.id]){
-                app.toolbar[button.id].call(app, e)
-            }
-        })
+            app.toolBtn.addEventListener('click', function(e){
+                var button = e.target.closest('button')
+                if(!button) return
+                if(app.toolbar[button.id]){
+                    app.toolbar[button.id].call(app, e)
+                }
+            })
 
-        // app.interface.wavesurfer.on('pause', function(){ 
-        //     app.video.status = 'pause'
-        //     playPause.classList.remove('active')
-        // })
-    
-        // app.interface.wavesurfer.on('play', function(){
-        //     app.video.status = 'play'
-        //     playPause.classList.add('active')
-        // })
+            volumeInput.addEventListener('change', function(e){
+                app.video.element.volume = e.target.value
+                if(e.target.value != 0){
+                    volumeController.classList.remove('active')
+                }else{
+                    volumeController.classList.add('active')
+                }
+            })
 
-        // app.interface.wavesurfer.on('region-created', function(region){
-        //     console.log('region 생성')
-        // })
-
-        app.interface.wavesurfer.on('region-update-end', function(region){
-            console.log('region 업데이트')
-        })
-
-        app.interface.wavesurfer.on('audioprocess', function(){
-            timer.textContent = formatTime(app.interface.wavesurfer.getCurrentTime())
-        })
-
-        volumeInput.addEventListener('change', function(e){
-            app.video.element.volume = e.target.value
-            if(e.target.value != 0){
-                volumeController.classList.remove('active')
-            }else{
-                volumeController.classList.add('active')
-            }
-        })
+            // app.interface.wavesurfer.on('pause', function(){ 
+            //     app.video.status = 'pause'
+            //     playPause.classList.remove('active')
+            // })
         
-        //audioprocess 
+            // app.interface.wavesurfer.on('play', function(){
+            //     app.video.status = 'play'
+            //     playPause.classList.add('active')
+            // })
+
+            // app.interface.wavesurfer.on('region-created', function(region){
+            //     console.log('region 생성')
+            // })
+        },
+
+        needReload: function(){
+            app.interface.wavesurfer.unAll()
+            var timer = document.querySelector('.work-footer .work-timer span:first-child')
+
+            app.interface.wavesurfer.on('region-update-end', function(region){
+                console.log('region 업데이트')
+            })
+
+            app.interface.wavesurfer.on('audioprocess', function(){
+                timer.textContent = formatTime(app.interface.wavesurfer.getCurrentTime())
+            })
+        }
+    }
+
+    app.initEvent = function(){
+
     }
     
     //keyEvent
