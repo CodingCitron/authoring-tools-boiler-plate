@@ -171,3 +171,39 @@ var interfaceApp = (function(){
     return interfaceApp
 
 })()
+
+var MoveElement = (function(){
+    function MoveElement(element, originElement){
+        this.element = element
+        this.status = 'not clicked'
+        this.startX = 0
+        this.startY = 0
+        this.originElement = originElement
+        this.originX = this.originElement.getBoundingClientRect().left
+        this.originY = this.originElement.getBoundingClientRect().top
+    }
+
+    MoveElement.prototype.active = function(option){
+        this.element.classList[option]('moving')
+    }
+
+    MoveElement.prototype.startPos = function(x, y){
+        this.status = 'clicked'
+        this.startX = x + this.originX
+        this.startY = y + this.originY
+        this.active('add')
+    }
+
+    MoveElement.prototype.transform = function(x, y){
+        this.element.style.transform = `translate(${x - this.startX}px, ${y - this.startY}px)`
+    }
+
+    MoveElement.prototype.posInit = function(){
+        this.status = 'not clicked'
+        this.startX = 0
+        this.startY = 0
+        this.active('remove')
+    }
+
+    return MoveElement
+}())

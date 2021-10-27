@@ -26,8 +26,12 @@
             radius: 3,
             color: 'red' 
         },
-
-        workArray: [],
+        workArea: {
+            areaElement: document.querySelector('.work-area'), 
+            element: document.querySelector('.work-video-area'),
+            workList: [],
+            moveFunction: ''
+        },
         activeEvent: false,
         mode: '',
     }
@@ -124,7 +128,7 @@
     }
 
     app.toolbar = {
-        drawCircle: function(e){
+        AIDraw: function(e){
             var pointList = app.interface.hands.drawPoint()
             var video = app.video
 
@@ -142,19 +146,13 @@
         },
         
         playPause: function(e){
-            var playPause = document.getElementById('playPause')
-
             // console.log(this.video.status)
             switch(this.video.status){
                 case 'pause':
                     app.interface.wavesurfer.play()
-                    app.video.status = 'play'
-                    playPause.classList.add('active')
                 break
                 case 'play':
                     app.interface.wavesurfer.pause()
-                    app.video.status = 'pause'
-                    playPause.classList.remove('active')
                 break
             }
         },
@@ -190,6 +188,7 @@
                             markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
                             if(!app.activeEvent) app.loadEvent.maintained()
                             app.loadEvent.needReload()
+                            app.workArea.moveFunction = new MoveElement(app.workArea.element, app.workArea.areaElement)
                         }).catch(function(error){
                             throw new Error(error)
                         })  
@@ -201,11 +200,16 @@
         }
     })
 
+    app.resize = function(){
+        
+    }
+
     app.loadEvent = {
         maintained: function(){
             app.activeEvent = true
             var volumeController = document.getElementById('volumeController')
             var volumeInput = document.querySelector('#volumeController input')
+            var workArea = document.querySelector('.work-area')
 
             console.log('Event Activation!')
 
@@ -226,38 +230,52 @@
                 }
             })
 
-            // app.interface.wavesurfer.on('pause', function(){ 
-            //     app.video.status = 'pause'
-            //     playPause.classList.remove('active')
-            // })
-        
-            // app.interface.wavesurfer.on('play', function(){
-            //     app.video.status = 'play'
-            //     playPause.classList.add('active')
-            // })
+            app.workArea.element.addEventListener('mousedown', function(e){
+                if(!e.target.classList.contains('work-video-area')) return
+                console.log(e.offsetX, e.offsetY)
+                app.workArea.moveFunction.startPos(e.offsetX, e.offsetY)
+            })
 
-            // app.interface.wavesurfer.on('region-created', function(region){
-            //     console.log('region 생성')
-            // })
+            workArea.addEventListener('mousemove', function(e){
+                if(app.workArea.moveFunction.status !== 'clicked') return
+                app.workArea.moveFunction.transform(e.clientX, e.clientY)
+            })
+
+            workArea.addEventListener('mouseup', function(e){
+                if(app.workArea.moveFunction.status !== 'clicked') return
+                app.workArea.moveFunction.posInit()
+            })
         },
 
         needReload: function(){
-            app.interface.wavesurfer.unAll()
+            var wavesurfer = app.interface.wavesurfer
+            wavesurfer.unAll()
+            
             var timer = document.querySelector('.work-footer .work-timer span:first-child')
-
-            app.interface.wavesurfer.on('region-update-end', function(region){
+            var playPause = document.getElementById('playPause')
+            
+            wavesurfer.on('region-update-end', function(region){
                 console.log('region 업데이트')
             })
 
-            app.interface.wavesurfer.on('audioprocess', function(){
+            wavesurfer.on('audioprocess', function(){
                 timer.textContent = formatTime(app.interface.wavesurfer.getCurrentTime())
+            })
+
+            wavesurfer.on('pause', function(){ 
+                app.video.status = 'pause'
+                playPause.classList.remove('active')
+            })
+        
+            wavesurfer.on('play', function(){
+                app.video.status = 'play'
+                playPause.classList.add('active')
+            })
+
+            wavesurfer.on('region-created', function(region){
+                console.log('region 생성')
             })
         }
     }
-
-    app.initEvent = function(){
-
-    }
-    
     //keyEvent
 }())
