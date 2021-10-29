@@ -109,8 +109,6 @@ var interfaceApp = (function(){
 
         }
 
-
-
         return WavesurferControl
     }())
 

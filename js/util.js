@@ -7,6 +7,11 @@ function checkFileExtension(string){
     return reg.test(string) 
 }
 
+/**
+ * 
+ * @param {int} time 
+ * @returns string min:second
+ */
 function formatTime(time){
     return [
         Math.floor((time % 3600) / 60), // minutes
@@ -14,6 +19,13 @@ function formatTime(time){
     ].join(':')
 }
 
+/**
+ * @param {int} plainWidth 오리지널 너비
+ * @param {int} plainHeight 오리지널 높이
+ * @param {int} changedWidth 변화된 너비
+ * @param {int} changedHeight 변화된 높이
+ * @returns {x: float, y: float} 너비 스케일, 높이 스케일
+ */
 function calcScale(plainWidth, plainHeight, changedWidth, changedHeight){
     var scaleX = changedWidth/plainWidth
     var scaleY = changedHeight/plainHeight
@@ -44,3 +56,5 @@ function calcScale(plainWidth, plainHeight, changedWidth, changedHeight){
 //브라우저를 떠날 때 이벤트 beforeunload 작업중인 작업이 있는데 물어보기
 
 //로컬 스토리지 작업중인 작업 저장
+
+//패딩 마진 등 각종 사이즈 가져오기

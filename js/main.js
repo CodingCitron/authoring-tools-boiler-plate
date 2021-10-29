@@ -12,6 +12,8 @@
             status: 'pause',
             scaleX: '',
             scaleY: '',
+            maxScale: 2,
+            minScale: 0.01
         },
         copyVideo: {
 
@@ -27,7 +29,7 @@
             color: 'red' 
         },
         workArea: {
-            areaElement: document.querySelector('.work-area'), 
+            originElement: document.querySelector('.work-area'), 
             element: document.querySelector('.work-video-area'),
             workList: [],
             moveFunction: ''
@@ -36,25 +38,8 @@
         mode: '',
     }
 
-    app.markScale = function(){
-        var markScale = document.querySelectorAll('.work-footer .work-scale span')
-        var video = app.video.element
-        var scale = calcScale(video.videoWidth, video.videoHeight, video.offsetWidth, video.offsetHeight)
-        markScale[1].textContent = scale.x.toFixed(2)
-        markScale[3].textContent = scale.y.toFixed(2)
-        app.video.scaleX = scale.x
-        app.video.scaleY = scale.y
-    }
-
-    app.video.volumeUp = function(){
-
-    }
-
-    app.video.volumeDown = function(){
-
-    } 
-
-    app.initialize = async function(){
+    //method - start
+    app.initialize = function(){
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
         var waveform = document.getElementById('waveform')
@@ -82,7 +67,7 @@
      * @param {object} object 
      */
     app.load = async function(object){
-        await app.initialize()
+        app.initialize()
 
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
@@ -163,7 +148,90 @@
         }
     }
 
-    //event
+    app.initSize = function(){
+        var originElement = this.workArea.originElement
+        var workArea = this.workArea.element
+        var video = app.video.element
+
+        var diffWidth = workArea.offsetWidth - video.offsetWidth
+        var diffHeight = workArea.offsetHeight - video.offsetHeight
+        var value
+
+        if(originElement.offsetWidth < workArea.offsetWidth || originElement.offsetHeight < workArea.offsetHeight){
+
+            var scale = calcScale(workArea.offsetWidth, workArea.offsetHeight, originElement.offsetWidth - diffWidth, originElement.offsetHeight - diffHeight)
+
+            value = Math.min(scale.x, scale.y)
+        }
+
+        this.updateScale(value)
+        this.centerArea()
+    }
+
+    app.centerArea = function(){
+        var origin = this.workArea.originElement
+        var workArea = this.workArea.element
+
+        var x = origin.offsetWidth * 0.5 - workArea.offsetWidth * 0.5
+        var y = origin.offsetHeight * 0.5 - workArea.offsetHeight * 0.5
+
+        workArea.style.transform = `translate(${x}px, ${y}px)`
+    }
+
+    app.updateScale = function(...value){
+        value.length === 0? value[0] = 1 : value 
+        var video = app.video.element
+        var width = video.videoWidth * value[0]
+        var height = video.videoHeight * (value[1] || value[0])
+
+        video.style.width = width + 'px'
+        video.style.height = height + 'px'
+        
+        app.interface.canvas.setSize(video)
+
+        app.markScale()
+    }
+
+    app.markScale = function(){
+        var markScale = document.querySelectorAll('.work-footer .work-scale span')
+        var video = app.video.element
+        var scale = calcScale(video.videoWidth, video.videoHeight, video.offsetWidth, video.offsetHeight)
+
+        markScale[1].textContent = scale.x.toFixed(2)
+        markScale[1].title = scale.x
+        markScale[3].textContent = scale.y.toFixed(2)
+        markScale[3].title = scale.y
+
+        app.video.scaleX = scale.x
+        app.video.scaleY = scale.y
+    }
+    
+    app.createClip = function(){
+
+    }
+
+    app.wheel = function(event){
+        var { scaleX, scaleY, maxScale, minScale } = app.video
+
+        scaleX = Number(scaleX.toFixed(2))
+        scaleY = Number(scaleY.toFixed(2))
+
+        if(event.wheelDelta > 0){
+            if(maxScale <= scaleX || maxScale <= scaleY) return
+            scaleX+= 0.01
+            scaleY+= 0.01
+        }else{
+            if(minScale >= scaleX || minScale >= scaleY) return
+            scaleX-= 0.01
+            scaleY-= 0.01
+        }
+
+        app.updateScale(scaleX, scaleY)
+    }
+
+    //method - end
+
+    //event - start
     app.menuBtn.addEventListener('click', function(e){
         if(app.menubar[e.target.id]){
             app.menubar[e.target.id](e)
@@ -183,12 +251,12 @@
                     result.video.addEventListener('loadeddata', function(){
                         app.status = app.interface.load(result.video, result.canvas.id)
                         .then(function(resolve){
+                            app.initSize()
                             var markDuration = document.querySelector('.work-footer .work-timer span:last-child')
-                            app.markScale()
                             markDuration.textContent = formatTime(app.interface.wavesurfer.getDuration())
                             if(!app.activeEvent) app.loadEvent.maintained()
                             app.loadEvent.needReload()
-                            app.workArea.moveFunction = new MoveElement(app.workArea.element, app.workArea.areaElement)
+                            app.workArea.moveFunction = new MoveElement(app.workArea.element, app.workArea.originElement)
                         }).catch(function(error){
                             throw new Error(error)
                         })  
@@ -199,10 +267,6 @@
             return console.log('mp4 확장자가 아닙니다.')
         }
     })
-
-    app.resize = function(){
-        
-    }
 
     app.loadEvent = {
         maintained: function(){
@@ -232,7 +296,6 @@
 
             app.workArea.element.addEventListener('mousedown', function(e){
                 if(!e.target.classList.contains('work-video-area')) return
-                console.log(e.offsetX, e.offsetY)
                 app.workArea.moveFunction.startPos(e.offsetX, e.offsetY)
             })
 
@@ -245,6 +308,8 @@
                 if(app.workArea.moveFunction.status !== 'clicked') return
                 app.workArea.moveFunction.posInit()
             })
+
+            workArea.addEventListener('wheel', app.wheel)
         },
 
         needReload: function(){
@@ -278,4 +343,6 @@
         }
     }
     //keyEvent
+
+    //event - end
 }())
