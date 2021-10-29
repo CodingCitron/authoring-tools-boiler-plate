@@ -101,9 +101,7 @@ var interfaceApp = (function(){
                 fillParent: true,
                 height: '64',
                 plugins: [
-                    WaveSurfer.regions.create({
-                        
-                    }),
+                    WaveSurfer.regions.create(),
                 ]
             })
 
@@ -193,6 +191,7 @@ var MoveElement = (function(){
     }
 
     MoveElement.prototype.transform = function(x, y){
+        if(x - this.startX < 0 || y - this.startY < 0) return
         this.element.style.transform = `translate(${x - this.startX}px, ${y - this.startY}px)`
     }
 

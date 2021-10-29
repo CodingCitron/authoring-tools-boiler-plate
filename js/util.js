@@ -32,6 +32,62 @@ function calcScale(plainWidth, plainHeight, changedWidth, changedHeight){
     return { x: scaleX, y: scaleY }
 }
 
+/*  if - false 
+    undefined, null
+    NaN
+    0 (숫자 리터럴) , -0
+    “” (빈 문자열)
+    false
+*/
+
+//시간 분할
+/*
+    start, end 포함 분할 
+    split은 start와 end를 포함한 배열의 길이
+    start = 1 , end = 9 라 가정했을 때
+    둘의 차이는 8 이고 5분할 할것이니 
+    8을 4로 나누면 2가 나오고 
+    start값 부터 더하면 start와 end를 포함한 분할을 할 수 있음
+
+    그러나 소수점 계산이라 끝까지 더하면 end부분에 오차가 발생할 것
+    그래서 start end는 받은 값을 그대로 쓸거고 가운데에 start, end를 제외한 값을 추가할 것
+*/
+/**
+ * 
+ * @param {float} start region에서 나온 start
+ * @param {float} end region에서 나온 end
+ * @param {int} split 내가 정한 배열의 길이
+ * @param {*} option 
+ * @returns array start, end를 포함한 split 길이의 배열을 리턴합니다.
+ */
+
+function timeDivid(start, end, split, option){
+    if(!split) return 
+    var num = end - start
+    var splitNum = num/(split - 1)
+    var array = []
+
+    for(var i = 1; i <= split - 2; i++){
+        array.push(start + splitNum * i)
+    }
+    
+    return [start, ...array, end]
+}
+
+//엘리먼트 만들기
+function addElement(elementName, parent, option){
+    var element = document.createElement(elementName)
+
+    if(option){
+        for(var key in option){
+            element[key] = option[key]
+        }
+    }
+
+    parent.append(element)
+    return element 
+}
+
 
 // 대상 node 선택
 
@@ -58,3 +114,5 @@ function calcScale(plainWidth, plainHeight, changedWidth, changedHeight){
 //로컬 스토리지 작업중인 작업 저장
 
 //패딩 마진 등 각종 사이즈 가져오기
+
+//polyfill

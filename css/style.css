@@ -165,6 +165,14 @@ button{
     transition: border 0.5s ease-in-out;
 }
 
+.work-video-area.moving h3{
+    -ms-user-select: none; 
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 .work-video-area.active{
     display: block;
 }
@@ -243,6 +251,7 @@ button{
 /* right-aside */
 .right-aside-info{
     min-width: 240px;
+    width: 240px;
     height: 100%;
     padding: 12px 4px;
     background-color: #222;
@@ -262,4 +271,20 @@ button{
 
 .work-footer .info > div:last-child{
     float: right;
+}
+
+/* clip-list */
+.right-aside-info h4{
+    margin-bottom: 12px;
+}
+
+.clip-list .clip video{
+    width: 100%;
+    object-fit: cover;
+}
+
+
+
+@media screen {
+    
 }

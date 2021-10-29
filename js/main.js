@@ -16,13 +16,14 @@
             minScale: 0.01
         },
         copyVideo: {
-
+            element: null,
         },
         canvas: {
-            element: '',
+            element: null,
         },
-        copyCanvas: {
-
+        canvasForImage: {
+            element: null,
+            context: null,
         },
         darwOption: {
             radius: 3,
@@ -31,11 +32,40 @@
         workArea: {
             originElement: document.querySelector('.work-area'), 
             element: document.querySelector('.work-video-area'),
-            workList: [],
             moveFunction: ''
         },
         activeEvent: false,
         mode: '',
+        store: {
+
+        }
+    }
+
+    app.loading = {
+        element: document.querySelector('.loading'),
+        status: 'hidden',
+
+        start: function(message){
+            var loding = app.loading
+            var messageEl = loding.element.querySelector('.message')
+
+            loding.status = 'active'
+            loding.element.classList.remove('hidden')
+            messageEl.textContent = message? message : 'loading...'
+        },
+
+        end: function(){
+            var loding = app.loading
+
+            loding.status = 'hidden'
+            loding.element.classList.add('hidden')
+        },
+
+        message: function(message){
+            var messageEl = loding.element.querySelector('.message')
+
+            messageEl.textContent = message? message : 'loading...'
+        }
     }
 
     //method - start
@@ -45,6 +75,23 @@
         var waveform = document.getElementById('waveform')
         var canvasWrapper = document.getElementById('canvas-wrapper')
         var playPause = document.getElementById('playPause')
+        var copyVideo
+        var canvasforImage
+
+        if(!app.copyVideo.element){
+           copyVideo = document.createElement('video')
+           copyVideo.id = 'copyVideo'
+           app.copyVideo.element = copyVideo
+           console.log(copyVideo)
+        }
+
+        if(!app.canvasForImage.element){
+            canvasforImage = document.createElement('canvas')
+            canvasforImage.id = 'canvasforImage'
+            app.canvasForImage.element = canvasforImage
+            app.canvasForImage.context = canvasforImage.getContext('2d')
+            console.log(app.canvasForImage.context)
+        }
 
         for(var i = 0; i < videoWrapper.childNodes.length; i++){
             videoWrapper.removeChild(videoWrapper.childNodes[i])
@@ -67,6 +114,7 @@
      * @param {object} object 
      */
     app.load = async function(object){
+        app.loading.start()
         app.initialize()
 
         var workVideoArea = document.querySelector('.work-video-area')
@@ -78,10 +126,12 @@
         this.canvas.element = document.createElement('canvas')
 
         var video = this.video.element
+        var copyVideo = this.copyVideo.element
         var canvas = this.canvas.element
 
         video.id = 'videoElement'
         video.src = URL.createObjectURL(object)
+        copyVideo.src = URL.createObjectURL(object)
 
         canvas.id = 'canvas'
         fileName.textContent = object.name
@@ -152,6 +202,10 @@
         var originElement = this.workArea.originElement
         var workArea = this.workArea.element
         var video = app.video.element
+        var canvasForImage = app.canvasForImage.element
+
+        canvasForImage.width = video.videoWidth
+        canvasForImage.height = video.videoHeight
 
         var diffWidth = workArea.offsetWidth - video.offsetWidth
         var diffHeight = workArea.offsetHeight - video.offsetHeight
@@ -179,7 +233,7 @@
     }
 
     app.updateScale = function(...value){
-        value.length === 0? value[0] = 1 : value 
+        value[0] === undefined? value[0] = 1 : value 
         var video = app.video.element
         var width = video.videoWidth * value[0]
         var height = video.videoHeight * (value[1] || value[0])
@@ -206,8 +260,46 @@
         app.video.scaleY = scale.y
     }
     
-    app.createClip = function(){
+    app.clip = {
+        split: 5,
+        create: async function(region){
+            var clipList = document.querySelector('.clip-list')
+            var time = timeDivid(region.start, region.end, app.clip.split)
 
+            var divOption = {
+                className: 'clip'
+            }
+
+            var videoOption = {
+                src: app.video.element.src + `#t=${time[0]}, ${time[time.length - 1]}`,
+                currentTime: time[0]
+            }
+
+            addElement('video', addElement('div', clipList, divOption), videoOption)  
+        },
+
+        waiting: []
+    }
+
+    app.data = {
+        fileName: '',
+        clip: []
+    }
+
+    app.frame = {
+        create: async function(time){
+            var video = app.copyVideo.element
+            var canvas = app.canvasForImage.element
+            var context = app.canvasForImage.context
+
+            video.currentTime = time
+
+            video.addEventListener('canplaythrough', async function(){
+                await context.drawImage(video, 0, 0)
+                img.src = canvas.toDataURL()
+            }, { once: true })  
+        },
+        waiting: []
     }
 
     app.wheel = function(event){
@@ -218,12 +310,12 @@
 
         if(event.wheelDelta > 0){
             if(maxScale <= scaleX || maxScale <= scaleY) return
-            scaleX+= 0.01
-            scaleY+= 0.01
+            scaleX += 0.01
+            scaleY += 0.01
         }else{
             if(minScale >= scaleX || minScale >= scaleY) return
-            scaleX-= 0.01
-            scaleY-= 0.01
+            scaleX -= 0.01
+            scaleY -= 0.01
         }
 
         app.updateScale(scaleX, scaleY)
@@ -257,6 +349,7 @@
                             if(!app.activeEvent) app.loadEvent.maintained()
                             app.loadEvent.needReload()
                             app.workArea.moveFunction = new MoveElement(app.workArea.element, app.workArea.originElement)
+                            app.loading.end()
                         }).catch(function(error){
                             throw new Error(error)
                         })  
@@ -295,7 +388,10 @@
             })
 
             app.workArea.element.addEventListener('mousedown', function(e){
-                if(!e.target.classList.contains('work-video-area')) return
+                var element = e.target.closest('div.work-range')
+                if(element && element.classList.contains('work-range')) return
+                if(e.target.nodeName === 'SPAN') return
+                console.log(e.target.nodeName)
                 app.workArea.moveFunction.startPos(e.offsetX, e.offsetY)
             })
 
@@ -320,7 +416,7 @@
             var playPause = document.getElementById('playPause')
             
             wavesurfer.on('region-update-end', function(region){
-                console.log('region 업데이트')
+                app.clip.create(region)
             })
 
             wavesurfer.on('audioprocess', function(){
@@ -339,6 +435,7 @@
 
             wavesurfer.on('region-created', function(region){
                 console.log('region 생성')
+                
             })
         }
     }

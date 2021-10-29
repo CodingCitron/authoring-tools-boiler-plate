@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
     <link rel="stylesheet" href="css/googleIcons.css">
     <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/loader.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="loading hidden">
+        <div class="loader"></div>
+        <p class="message">message</p>
+    </div>
     <main class="workspace">
         <div class="hidden">
             <input type="file" id="openFile">
@@ -57,6 +62,11 @@
                         auto_fix_normal
                     </span>
                 </button>
+                <button title="remove circle">
+                    <span class="material-icons">
+                        remove_circle
+                    </span>
+                </button>
                 <button id="playPause">
                     <span class="material-icons">
                         play_arrow
@@ -77,13 +87,21 @@
                     </span>
                 </button>
                 <button>
-                    <span class="material-icons">
+                    <!-- <span class="material-icons">
                         open_with
+                    </span> -->
+                    <span class="material-icons">
+                        mouse
                     </span>
                 </button>
-                <button>
+                <!-- <button>
                     <span class="material-icons">
                         zoom_out_map
+                    </span>
+                </button> -->
+                <button title="center the element">
+                    <span class="material-icons">
+                        filter_center_focus
                     </span>
                 </button>
             </aside>
@@ -133,7 +151,7 @@
                 <section>
                     <h4>클립 모음</h4>
                     <div class="clip-list">
-
+                        
                     </div>
                 </section>
             </aside>
@@ -150,6 +168,8 @@
     <!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
     <script src="./js/util.js"></script>
     <script src="./js/authoringTool.js"></script>
+    <script src="./js/constant.js"></script>
     <script src="./js/main.js"></script>
+    <script src="./js/global.js"></script>
 </body>
 </html>
