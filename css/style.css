@@ -24,11 +24,16 @@ a{
     clear: both;
 }
 
+video, 
+img{
+    display: block;
+}
+
 body{
-    background: #888;
+    background: #E3E3E6;
     font-size: 14px;
     height: 100vh;
-    color: white;
+    color: #F1F1F5;
 }
 
 button{
@@ -48,28 +53,28 @@ button{
     height: calc(100vh - 38px);
 }
 
-.menu-bar{
+.menubar{
     float: left;
     width: 100%;
     height: 38px;
     min-height: 38px;
     padding: 0 38px;
-    background: #222;
-    color: white;
+    background: #201E1D;
+    color: inherit;
 }
 
-.menu-bar,
-.menu-bar > ul > li,
-.tool-bar{
+.menubar,
+.menubar > ul > li,
+.toolbar{
     z-index: 10;
 }
 
-.menu-bar > ul > li{
+.menubar > ul > li{
     position: relative;
     float: left;
 }
 
-.menu-bar > ul > li > button{
+.menubar > ul > li > button{
     width: 100%;
     height: 38px;
     padding: 0 16px;
@@ -77,26 +82,26 @@ button{
     transition: 0.3s ease-in-out;
 }
 
-.tool-bar button:hover,
-.menu-bar > ul > li > ul > li:hover, 
-.menu-bar > ul > li:hover > button{
-    background-color: #555;
+.toolbar button:hover,
+.menubar > ul > li > ul > li:hover, 
+.menubar > ul > li:hover > button{
+    background-color: #A4A4A6;
     cursor: pointer;
 }
 
-.menu-bar > ul > li > ul{
+.menubar > ul > li > ul{
     display: none;
     position: absolute;
     width: 200px;
-    opacity: 0.9;
+    opacity: 1;
 }
 
-.menu-bar > ul > li > ul > li{
-    background-color: #222;
+.menubar > ul > li > ul > li{
+    background-color: #201E1D;
     padding: 6px 4px;
 }
 
-.menu-bar > ul > li:hover > ul{
+.menubar > ul > li:hover > ul{
     display: block;
 }
 
@@ -105,15 +110,19 @@ button{
     display: -ms-flexbox;
 }
 
-.tool-bar{
+aside.toolbar{
+    border-top: 1px solid #E9E8EB;
+}
+
+.toolbar{
     min-width: 38px;
     width: 38px;
     height: 100%;
     /* padding: 16px 0; */
-    background-color: #222;
+    background-color: #201E1D;
 }
 
-.tool-bar button{
+.toolbar button{
     width: 100%;
     padding: 12px 0;
     text-align: center;
@@ -154,14 +163,14 @@ button{
     position: absolute;
     overflow: auto;
     padding: 12px 4px 4px;
-    border: 4px solid #444;
-    background-color: #444;
+    border: 3px solid #201E1D;
+    background-color: #333;
+    border-radius: 4px;
     transition: border 0.5s ease-in-out;
 }
 
 .work-video-area.moving{
     cursor: move;
-    border: 4px solid tomato;
     transition: border 0.5s ease-in-out;
 }
 
@@ -181,7 +190,7 @@ button{
     font-size: 14px;
     margin-bottom: 8px;
     font-weight: 400;
-    color: peachpuff;
+    color: #EEEEEE;
     vertical-align: top;
 }
 
@@ -197,9 +206,12 @@ button{
 #waveform-wrapper{
     position: absolute;
     bottom: 0;
-    width: calc(100% - 10px); /* border * 2 - 해줘야 함 */
-    background-color: rgb(85, 85, 85);
-    border: 5px solid #444;
+    width: calc(100% - 2px); /* border * 2 - 해줘야 함 */
+    background-color: #E3E3E6;
+    border-top: 5px solid #201E1D;
+    border-bottom: 5px solid #201E1D;
+    border-left: 1px solid #E9E8EB;
+    border-right: 1px solid #E9E8EB;
     box-sizing: content-box;
 }
 
@@ -238,11 +250,16 @@ button{
     height: 100%;
     padding: 12px 8px;
     line-height: 22px;
-    background-color: #222;
+    background-color: #201E1D;
 }
 
 #volumeController.toggle > div{
     display: block;
+}
+
+#possibleScale.toggle{
+    background: #A4A4A6;
+    transition: 0.3s ease-in-out;
 }
 /* 상태 변화 */
 
@@ -250,11 +267,42 @@ button{
 
 /* right-aside */
 .right-aside-info{
-    min-width: 240px;
-    width: 240px;
+    display: flex;
+    display: -ms-flexbox;
+    max-width: 278px;
+    min-width: 278px;
     height: 100%;
+    background-color: #201E1D;
+    border-top: 1px solid #E9E8EB;
+    overflow: auto;
+    transition: 0.5s ease-in-out;
+}
+
+.right-aside-info .toolbar{
+
+}
+
+.right-aside-info section{
+    width: 100%;
+    border-left: 1px solid #E9E8EB;    
+}
+
+.right-aside-info h4{
+    position: sticky;
+    top: 0;
+    /* margin-bottom: 12px; */
     padding: 12px 4px;
-    background-color: #222;
+    background: #201E1D;
+}
+
+.right-aside-info.close{
+    transform: translateX(calc(100% - 38px));
+    overflow: hidden;
+}
+
+.right-aside-info.close{
+    max-width: 38px;
+    min-width: 38px;
 }
 
 .right-aside-info h4{
@@ -274,17 +322,104 @@ button{
 }
 
 /* clip-list */
-.right-aside-info h4{
-    margin-bottom: 12px;
+.clip-list{
+    border-bottom: 1px solid #E9E8EB;
+}
+
+.clip-list .clip{
+    padding: 4px;
+    border-top: 1px solid #E9E8EB;
 }
 
 .clip-list .clip video{
     width: 100%;
+    margin-top: 4px;
     object-fit: cover;
 }
 
+.clip-list .clip .open-btn{
+    display: flex;
+    display: -ms-flexbox;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #E9E8EB;
+    border-radius: 4px;
+    text-align: left;
+    background: #333;
+}
 
+.clip-list .frames{
+    display: flex;
+    display: -ms-flexbox;
+    margin-top: 4px;
+}
+
+.clip-list .frames img{
+    width: 20%;
+}
+
+.clip-list .clip .material-icons{
+    font-size: 18px;
+    vertical-align: bottom;
+}
+
+.clip-list .clip.open-and-close .frames,
+.clip-list .clip.open-and-close .clip-video-container{
+    display: none;
+}
+/* clip-list */
+/* right-aside */
+
+/* scroll-bar */
+.right-aside-info::-webkit-scrollbar,
+.work-area::-webkit-scrollbar{
+    width: 12px;
+    height: 12px;
+}
+
+.right-aside-info::-webkit-scrollbar-thumb,
+.work-area::-webkit-scrollbar-thumb{
+    background-color: #A4A4A6;
+    background-clip: padding-box;
+    border: 3px solid transparent;
+    border-radius: 6px;
+}
+F1F1F5
+.right-aside-info::-webkit-scrollbar-track,
+.work-area::-webkit-scrollbar-track{
+    background: #F1F1F5;
+    border: 2px solid #201E1D;
+}
+/* scroll-bar */
 
 @media screen {
     
 }
+
+/*
+COLOR CODES
+#201E1D
+#101C1E
+#638B9A
+#A5C8DF
+#D8E7DB
+#D0D3DA
+#4A5945
+#ACAF80
+#EADCBD
+#E9E8EB 중요색
+#F1F1F5
+
+바탕: E3E3E6
+메뉴, 툴, 사이드: 201E1D
+서브: 333
+강조 메뉴바 or 툴바 or 사이드 메뉴바: A4A4A6
+글자: F1F1F5
+경고, 에러: F01107
+완료: 44F252
+진행중: FF6E26
+보더: E9E8EB
+알람: 333 < background
+*/
+

@@ -32,6 +32,12 @@ function calcScale(plainWidth, plainHeight, changedWidth, changedHeight){
     return { x: scaleX, y: scaleY }
 }
 
+function ajax(url, data){
+    $.ajax({
+
+    })
+}
+
 /*  if - false 
     undefined, null
     NaN
@@ -75,7 +81,7 @@ function timeDivid(start, end, split, option){
 }
 
 //엘리먼트 만들기
-function addElement(elementName, parent, option){
+function addElement(elementName, parent, option, text){
     var element = document.createElement(elementName)
 
     if(option){
@@ -84,9 +90,25 @@ function addElement(elementName, parent, option){
         }
     }
 
-    parent.append(element)
+    if(text){
+        element.textContent = text
+    }
+
+    parent.appendChild(element)
     return element 
 }
+
+function updateElement(selector, option){
+    var element = document.querySelector(selector)
+    
+    if(option){
+        for(var key in option){
+            element[key] = option[key]
+        }
+    }
+}
+
+
 
 
 // 대상 node 선택

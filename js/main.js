@@ -1,10 +1,10 @@
-(function(){
+var app = (function(){
     'use strict'
 
     var app = {
         interface: interfaceApp,
-        menuBtn: document.querySelector('.menu-bar'),
-        toolBtn: document.querySelector('.tool-bar'),
+        menuBtn: document.querySelector('.menubar'),
+        toolBtn: document.querySelector('.toolbar'),
         fileBtn: document.querySelector('#openFile'),
         status: 'load',
         video: {
@@ -36,9 +36,6 @@
         },
         activeEvent: false,
         mode: '',
-        store: {
-
-        }
     }
 
     app.loading = {
@@ -72,9 +69,10 @@
     app.initialize = function(){
         var workVideoArea = document.querySelector('.work-video-area')
         var videoWrapper = document.getElementById('video-wrapper')
-        var waveform = document.getElementById('waveform')
+        // var waveform = document.getElementById('waveform')
         var canvasWrapper = document.getElementById('canvas-wrapper')
         var playPause = document.getElementById('playPause')
+        var clipList = document.querySelector('.clip-list')
         var copyVideo
         var canvasforImage
 
@@ -93,16 +91,29 @@
             console.log(app.canvasForImage.context)
         }
 
-        for(var i = 0; i < videoWrapper.childNodes.length; i++){
-            videoWrapper.removeChild(videoWrapper.childNodes[i])
-        }
-        
-        for(var i = 0; i < waveform.childNodes.length; i++){
-            waveform.removeChild(waveform.childNodes[i])
+        var i = videoWrapper.childNodes.length
+        for(i; i > 0; i--){
+            if(videoWrapper.childNodes[i]){
+                videoWrapper.childNodes[i].remove()
+            }
         }
 
-        for(var i = 0; i < canvasWrapper.childNodes.length; i++){
-            canvasWrapper.removeChild(canvasWrapper.childNodes[i])
+        if(app.interface.wavesurfer){
+           app.interface.wavesurfer.destroy() 
+        }
+
+        i = canvasWrapper.childNodes.length
+        for(i; i > 0; i--){
+            if(canvasWrapper.childNodes[i]){
+                canvasWrapper.childNodes[i].remove()
+            }
+        }
+        
+        i = clipList.childNodes.length
+        for(i; i > 0; i--){
+            if(clipList.childNodes[i]){
+                clipList.childNodes[i].remove()
+            }
         }
 
         app.video.status = 'pause'
@@ -163,6 +174,7 @@
     }
 
     app.toolbar = {
+        scaleCanModified: false, 
         AIDraw: function(e){
             var pointList = app.interface.hands.drawPoint()
             var video = app.video
@@ -195,6 +207,33 @@
         volumeController: function(e){
             if(e.target.nodeName === 'INPUT' || e.target.nodeName === 'DIV') return
             volumeController.classList.toggle('toggle')
+        },
+
+        possibleScale: function(e){
+            var possibleScale = document.getElementById('possibleScale')
+            app.toolbar.scaleCanModified = possibleScale.classList.toggle('toggle')
+            console.log(app.toolbar.scaleCanModified)
+        },
+
+        centerTheElement: function(e){
+            this.centerArea()
+        },
+
+        leftSide: function(button){
+            if(button.classList.contains('open-btn')){
+                var clip = button.parentNode
+                var icon = clip.querySelector('.material-icons')
+
+                clip.classList.toggle('open-and-close')?
+                // clip.contains('open-and-close')? 
+                icon.textContent = 'expand_more' : icon.textContent = 'expand_less'
+            }
+        },
+
+        rightToolbarView: function(e, btn){
+            var rightAsideInfo = document.querySelector('.right-aside-info')
+            var span = btn.querySelector('span')
+            rightAsideInfo.classList.toggle('close') ? span.textContent = 'chevron_left' : span.textContent = 'navigate_next' 
         }
     }
 
@@ -259,50 +298,143 @@
         app.video.scaleX = scale.x
         app.video.scaleY = scale.y
     }
+
+    app.data = {
+        fileName: '',
+        clips: [],
+        find: function(id){
+            var array = app.data.clips
+
+            var region = array.find(function(clip){
+                return clip.id === id
+            })
+
+            var index = array.findIndex(function(clip){
+                return clip.id === id
+            })
+
+            return { index: index, region: region }
+        }
+    }
     
+    app.set = {
+
+    }
+
     app.clip = {
+        rule: {
+            naming: 'clip_',
+            number: 0,
+        },
         split: 5,
+        selected: [],
         create: async function(region){
+            var data = app.data
+            var find = data.find(region.id)
+
+            if(find.region) return app.clip.update(region, find.index)
+            
             var clipList = document.querySelector('.clip-list')
             var time = timeDivid(region.start, region.end, app.clip.split)
 
+            var variable = {
+                id: region.id,
+                start: region.start,
+                end: region.end,
+                frames: []
+            }
+            
+            data.clips.push(variable)
+
             var divOption = {
-                className: 'clip'
+                className: 'clip',
+                id: region.id
             }
-
+            
+            //src 부분 개선할 필요 있음
             var videoOption = {
-                src: app.video.element.src + `#t=${time[0]}, ${time[time.length - 1]}`,
-                currentTime: time[0]
+                src: app.video.element.src + `#t=${region.start}, ${region.end}`,
+                currentTime: region.start,
+                title: region.start + ' ~ ' + region.end
             }
 
-            addElement('video', addElement('div', clipList, divOption), videoOption)  
+            var parentEl = addElement('div', clipList, divOption)
+            var button = addElement('button', parentEl, { type: 'button', className: 'open-btn' })
+
+            addElement('span', button, null, region.id)
+            addElement('span', button, { className: 'material-icons' }, 'expand_less')
+            
+            var div = addElement('div', parentEl, { className: 'clip-video-container' })
+            addElement('video', div, videoOption)  
+
+            /*
+                <span class="material-icons-outlined">
+                    expand_more
+                </span>
+            */
+            var framesDiv = addElement('div', parentEl, { className: 'frames'})
+            time.forEach(time => app.frame.create(time, framesDiv))
+        },
+
+        update: function(region, index){
+            var data = app.data
+
+            data.clips[index].start = region.start
+            data.clips[index].end = region.end
+
+            var option = {
+                src: app.video.element.src + `#t=${region.start}, ${region.end}`,
+                currentTime: region.start 
+            }
+
+            updateElement(`#${region.id} video`, option)
+        },
+
+        focus: function(region){
+
         },
 
         waiting: []
     }
 
-    app.data = {
-        fileName: '',
-        clip: []
-    }
-
     app.frame = {
-        create: async function(time){
+        status: 'not',
+        create: async function(time, parentEl){
+            if(app.frame.status === 'run'){
+                return app.frame.waiting.push([time, parentEl])
+            }
+
+            app.frame.status = 'run'
             var video = app.copyVideo.element
             var canvas = app.canvasForImage.element
             var context = app.canvasForImage.context
 
             video.currentTime = time
 
-            video.addEventListener('canplaythrough', async function(){
+            return video.addEventListener('canplaythrough', async function(){
                 await context.drawImage(video, 0, 0)
-                img.src = canvas.toDataURL()
+                addElement('img', parentEl, 
+                { 
+                    src: canvas.toDataURL(),
+                    title: time,
+                })
+                app.frame.sequentialExecution()
             }, { once: true })  
         },
-        waiting: []
+
+        waiting: [],
+
+        sequentialExecution: function(){
+            app.frame.status = 'not'
+            if(app.frame.waiting.length > 0){
+                app.frame.create(app.frame.waiting[0][0], app.frame.waiting[0][1]) 
+                app.frame.waiting.shift()
+            }
+        }
     }
 
     app.wheel = function(event){
+        if(!app.toolbar.scaleCanModified) return
         var { scaleX, scaleY, maxScale, minScale } = app.video
 
         scaleX = Number(scaleX.toFixed(2))
@@ -367,8 +499,19 @@
             var volumeController = document.getElementById('volumeController')
             var volumeInput = document.querySelector('#volumeController input')
             var workArea = document.querySelector('.work-area')
+            var rightAsideInfo = document.querySelector('.right-aside-info')
 
             console.log('Event Activation!')
+
+            rightAsideInfo.addEventListener('click', function(e){
+                var button = e.target.closest('button')
+                if(!button) return
+                if(button.id){
+                    app.toolbar[button.id](e, button)
+                }else{
+                    app.toolbar.leftSide(button)
+                }
+            })
 
             app.toolBtn.addEventListener('click', function(e){
                 var button = e.target.closest('button')
@@ -434,12 +577,25 @@
             })
 
             wavesurfer.on('region-created', function(region){
-                console.log('region 생성')
-                
+                var regionElement = document.querySelector(`[data-id=${region.id}]`)
+                var rule = app.clip.rule
+
+                region.id = rule.naming + rule.number
+                regionElement.dataset.id = rule.naming + rule.number
+
+                rule.number++
             })
         }
     }
     //keyEvent
 
     //event - end
+
+
+    //resize
+    return app.resize = {
+        resizeInit: function(){
+            console.log('resize event')
+        }
+    }
 }())

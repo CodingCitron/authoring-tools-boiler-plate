@@ -95,11 +95,12 @@ var interfaceApp = (function(){
         function WavesurferControl(waveform){
             this.wavesurfer = WaveSurfer.create({
                 container: waveform,
-                waveColor: 'white',
+                waveColor: 'FF6E26',
                 progressColor: 'red',
                 backend: 'MediaElement',
                 fillParent: true,
                 height: '64',
+                scrollParent: true,
                 plugins: [
                     WaveSurfer.regions.create(),
                 ]
