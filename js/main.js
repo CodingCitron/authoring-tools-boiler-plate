@@ -352,7 +352,28 @@ var app = (function(){
             }
             
             //src 부분 개선할 필요 있음
+            // var videoOption = {
+            //     src: app.video.element.src + `#t=${region.start}, ${region.end}`,
+            //     currentTime: region.start,
+            //     title: region.start + ' ~ ' + region.end
+            // }
+
+            // var newSrc = new Blob(
+            //     app.video.element.src + `#t=${region.start}, ${region.end}`
+            //     , { type: 'video/mp4' }    
+            // )
+
+            // console.log(app.video.element.src)
+            // var file = new File([app.video.element.src + `#t=${region.start}, ${region.end}`], 'any')
+            // // console.log(file)
+            // var newSrc = new Blob(
+            //     [file], { type: 'video/mp4' }
+            // )
+            // console.log(file)
+            // console.log(newSrc)
+
             var videoOption = {
+                // src: URL.createObjectURL(newSrc),
                 src: app.video.element.src + `#t=${region.start}, ${region.end}`,
                 currentTime: region.start,
                 title: region.start + ' ~ ' + region.end
