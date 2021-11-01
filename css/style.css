@@ -309,6 +309,20 @@ aside.toolbar{
     font-weight: 400;
 }
 
+.right-aside-info #setBtn{
+    text-align: center;
+}
+
+.right-aside-info .sets-text{
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 2px solid #E9E8EB;
+    border-radius: 50%;
+    font-size: 14px;
+    text-align: center;
+}
+
 .work-footer{
     padding: 4px 0 0;
 }
