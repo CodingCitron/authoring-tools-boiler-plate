@@ -1,5 +1,7 @@
 var app = (function(){
     'use strict'
+    //private
+    console.count('run count')
 
     var app = {
         interface: interfaceApp,
@@ -302,6 +304,20 @@ var app = (function(){
     app.data = {
         fileName: '',
         clips: [],
+        sets: [],
+    }
+
+    app.set = {
+
+    }
+
+    app.clip = {
+        rule: {
+            naming: 'clip_',
+            number: 0,
+        },
+        split: 5,
+        selected: [],
         find: function(id){
             var array = app.data.clips
 
@@ -314,23 +330,9 @@ var app = (function(){
             })
 
             return { index: index, region: region }
-        }
-    }
-    
-    app.set = {
-
-    }
-
-    app.clip = {
-        rule: {
-            naming: 'clip_',
-            number: 0,
         },
-        split: 5,
-        selected: [],
         create: async function(region){
-            var data = app.data
-            var find = data.find(region.id)
+            var find = app.clip.find(region.id)
 
             if(find.region) return app.clip.update(region, find.index)
             
@@ -344,7 +346,7 @@ var app = (function(){
                 frames: []
             }
             
-            data.clips.push(variable)
+            app.data.clips.push(variable)
 
             var divOption = {
                 className: 'clip',
@@ -613,10 +615,19 @@ var app = (function(){
     //event - end
 
 
-    //resize
-    return app.resize = {
+    //resize pulic
+    return app.public = {
         resizeInit: function(){
             console.log('resize event')
+        },
+        info: {
+            all: function(){
+                console.log(app)
+            },
+            data: function(){
+                console.log(app.data)
+            }
         }
+            
     }
 }())
