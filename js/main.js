@@ -307,6 +307,16 @@ var app = (function(){
         sets: [],
     }
 
+    // Object.defineProperty(app.clip, 'create', {
+    //     get() {
+    //         console.log('get!');
+         
+    //     },
+    //     set(value) {
+    //         console.log(value)
+    //     }
+    // })
+
     app.set = {
 
     }
